@@ -1,7 +1,9 @@
 #!/usr/bin/python
-import os, sys
+import os
 import hashlib
 import argparse
+import db as db
+
 
 def walk(folder, ignore):
     fileList = []
@@ -25,14 +27,24 @@ def hashfile(path, blocksize = 65536):
     return hasher.hexdigest()
  
 
-def merge(files):
-    print 'merge '+str(files)
+def merge(path):
+    print 'merge '
 
-def delete(files):
-    print 'delete '+str(files)
+def delete(path):
+    digest = hashfile(path)
+    files = db.get(digest)
+    if len(files) >= 2:
+        os.remove(path)
+        db.remove(digest, path)
+    elif len(files) == 1 and path not in files:
+        os.remove(path)
+    else:
+        print '%s is not duped, count: %d' % (path, len(files))
 
-def index(files):
-    print 'index '+str(files)
+def index(path):
+    digest = hashfile(path)
+    db.save(digest, path)
+
  
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='index and clean your files safely')
@@ -45,6 +57,9 @@ if __name__ == '__main__':
             help='target files/folders')
     args = parser.parse_args()
     for f in args.files:
-        for l in walk(f, ['.svn','.git']):
-            args.accumulate(l)
+        if os.path.isdir(f):
+            for l in walk(f, ['.svn','.git']):
+                args.accumulate(l)
+        else:
+            args.accumulate(os.path.realpath(f))
     
