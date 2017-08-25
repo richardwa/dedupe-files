@@ -3,9 +3,7 @@ import os
 import hashlib
 import argparse
 import db as db
-import FileHander
-
-
+from fileutil import PathHandler
  
 def hashfile(path, blocksize = 65536):
     afile = open(path, 'rb')
@@ -16,20 +14,19 @@ def hashfile(path, blocksize = 65536):
         buf = afile.read(blocksize)
     afile.close()
     return hasher.hexdigest()
- 
 
 def merge(files, ignore):
     *source, target = files
     if os.isdir(target):
         handler = new PathHandler()
-        for path in handler.combine(source):
-
+        for root,files in handler.combineKeyed(source):
+            for f in files:
+                print '%s -> %s' % (f[len(root):],target)
     else:
         print '$s is not a folder' % target
 
 def delete(files, ignore):
     handler = new PathHandler(ignore)
-
     digest = hashfile(path)
     files = db.get(digest)
     if len(files) >= 2:
