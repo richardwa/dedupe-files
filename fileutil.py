@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import os
 
 class PathHandler:
@@ -33,8 +33,8 @@ class PathHandler:
 #Tests
 if __name__ == '__main__':
     p = PathHandler()
-    print p.walkFolder('.')
-    print p.combine(['..','.'])
-    print p.combineKeyed(['..','.'])
+    print(p.walkFolder('.'))
+    print(p.combine(['..','.']))
+    print(p.combineKeyed(['..','.']))
 
 

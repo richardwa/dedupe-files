@@ -17,16 +17,16 @@ def hashfile(path, blocksize = 65536):
 
 def merge(files, ignore):
     *source, target = files
-    if os.isdir(target):
-        handler = new PathHandler()
+    if os.path.isdir(target):
+        handler = PathHandler()
         for root,files in handler.combineKeyed(source):
             for f in files:
-                print '%s -> %s' % (f[len(root):],target)
+                print('%s -> %s' % (f[len(root):],target))
     else:
-        print '$s is not a folder' % target
+        print('%s is not a folder' % target)
 
 def delete(files, ignore):
-    handler = new PathHandler(ignore)
+    handler = PathHandler(ignore)
     digest = hashfile(path)
     files = db.get(digest)
     if len(files) >= 2:
@@ -35,24 +35,24 @@ def delete(files, ignore):
     elif len(files) == 1 and path not in files:
         os.remove(path)
     else:
-        print '%s is not duped, count: %d' % (path, len(files))
+        print('%s is not duped, count: %d' % (path, len(files)))
 
 def save(files, ignore):
-    handler = new PathHandler(ignore)
-    for path in handler.combine(files)
+    handler = PathHandler(ignore)
+    for path in handler.combine(files):
         digest = hashfile(path)
         db.save(digest, path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='index and clean your files safely')
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('-s','--save', dest='accumulate',action='store_const',const=index,
+    group.add_argument('-s','--save', dest='accumulate',action='store_const',const=save,
             help='save hashes')
     group.add_argument('-d','--delete', dest='accumulate',action='store_const',const=delete,
             help='safe delete, will not delete anything that is not duped')
     group.add_argument('-m','--merge', dest='accumulate',action='store_const',const=merge,
             help='merege files/folders last argument must be a folder')
-    parser.add_argument('-i','--ignore', default='.svn,.git'
+    parser.add_argument('-i','--ignore', default='.svn,.git',
             help='ignored folders (not used with merge)')
     parser.add_argument('files', metavar='file', nargs='+',
             help='target files/folders')
