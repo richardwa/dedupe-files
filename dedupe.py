@@ -18,10 +18,13 @@ def hashfile(path, blocksize = 65536):
 def merge(files, ignore):
     *source, target = files
     if os.path.isdir(target):
+        target_abs = os.path.realpath(target)
+        print(target_abs)
         handler = PathHandler()
         for root,files in handler.combineKeyed(source):
             for f in files:
-                print('%s -> %s' % (f[len(root):],target))
+                relpath = os.path.relpath(f,root)
+                print('%s -> %s' % (f,os.path.join(target_abs,relpath)))
     else:
         print('%s is not a folder' % target)
 
