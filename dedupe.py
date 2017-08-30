@@ -2,8 +2,11 @@
 import os
 import hashlib
 import argparse
-import db as db
+import db 
 from fileutil import PathHandler
+
+digestTable = KeyType(b'H')
+pathTable = KeyType('P')
  
 def hashfile(path, blocksize = 65536):
     afile = open(path, 'rb')
@@ -25,6 +28,10 @@ def merge(files, ignore):
             for f in files:
                 relpath = os.path.relpath(f,root)
                 print('%s -> %s' % (f,os.path.join(target_abs,relpath)))
+                digest = hashfile(f)
+                if len([c for c in db.get(h) if c != f]) > 1:
+                    print('delete file '+f)
+
     else:
         print('%s is not a folder' % target)
 
@@ -44,7 +51,8 @@ def save(files, ignore):
     handler = PathHandler(ignore)
     for path in handler.combine(files):
         digest = hashfile(path)
-        db.save(digest, path)
+        digestTable.append(digest, path)
+        pathTable.set(path, digest)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='index and clean your files safely')
